@@ -16,6 +16,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+
 from openai import OpenAI
 
 load_dotenv()
@@ -25,7 +26,7 @@ load_dotenv()
 def setup_selenium():
     options = Options()
 
-    # adding args
+    # adding arguments
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1920,1080")
@@ -39,7 +40,31 @@ def setup_selenium():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
+def fetch_html_selenium(url):
+    driver = setup_selenium()
+    try:
+        driver.get(url)
+        
+        # Add random delays to mimic human behavior
+        time.sleep(5)  # Adjust this to simulate time for user to read or interact
+        
+        # Add more realistic actions like scrolling
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(3)  # Simulate time taken to scroll and read
+        
+        html = driver.page_source
+        return html
+    finally:
+        driver.quit()
 
+def clean_html(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Remove headers and footers based on common HTML tags or classes
+    for element in soup.find_all(['header', 'footer']):
+        element.decompose()  # Remove these tags and their content
+
+    return str(soup)
 
 
 if __name__ == "__main__":
