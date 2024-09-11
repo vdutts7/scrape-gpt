@@ -67,6 +67,20 @@ def clean_html(html_content):
     return str(soup)
 
 
+def html_to_markdown_with_readability(html_content):
+
+    
+    cleaned_html = clean_html(html_content)  
+    
+    # Convert to markdown
+    markdown_converter = html2text.HTML2Text()
+    markdown_converter.ignore_links = False
+    markdown_content = markdown_converter.handle(cleaned_html)
+    
+    return markdown_content
+
+
+
 if __name__ == "__main__":
     url = 'https://news.ycombinator.com/'
     fields=['Title', 'Number of Points', 'Creator', 'Time Posted', 'Number of Comments']
