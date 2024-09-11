@@ -220,6 +220,25 @@ def save_formatted_data(formatted_data, timestamp, output_folder='output'):
         return None
 
 
+def calculate_price(input_text, output_text, model=model_used):
+    # Initialize the encoder for the specific model
+    encoder = tiktoken.encoding_for_model(model)
+    
+    # Encode the input text to get the number of input tokens
+    input_token_count = len(encoder.encode(input_text))
+    
+    # Encode the output text to get the number of output tokens
+    output_token_count = len(encoder.encode(output_text))
+    
+    # Calculate the costs
+    input_cost = input_token_count * pricing[model]["input"]
+    output_cost = output_token_count * pricing[model]["output"]
+    total_cost = input_cost + output_cost
+    
+    return input_token_count, output_token_count, total_cost
+
+
+
 if __name__ == "__main__":
     url = 'https://news.ycombinator.com/'
     fields=['Title', 'Number of Points', 'Creator', 'Time Posted', 'Number of Comments']
