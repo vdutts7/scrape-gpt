@@ -81,6 +81,37 @@ def html_to_markdown_with_readability(html_content):
 
 
 
+# Define got-40-mini pricing w/o Batch API
+pricing = {
+    "gpt-4o-mini": {
+        "input": 0.150 / 1_000_000,  # $0.150 per 1M input tokens
+        "output": 0.600 / 1_000_000, # $0.600 per 1M output tokens
+    },
+    "gpt-4o-2024-08-06": {
+        "input": 2.5 / 1_000_000,  # $0.150 per 1M input tokens
+        "output": 10 / 1_000_000, # $0.600 per 1M output tokens
+    },
+
+
+    # Add other models and their prices here if needed
+}
+
+model_used="gpt-4o-mini"
+    
+def save_raw_data(raw_data, timestamp, output_folder='output'):
+    # Ensure the output folder exists
+    os.makedirs(output_folder, exist_ok=True)
+    
+    # Save the raw markdown data with timestamp in filename
+    raw_output_path = os.path.join(output_folder, f'rawData_{timestamp}.md')
+    with open(raw_output_path, 'w', encoding='utf-8') as f:
+        f.write(raw_data)
+    print(f"Raw data saved to {raw_output_path}")
+    return raw_output_path
+
+
+
+
 if __name__ == "__main__":
     url = 'https://news.ycombinator.com/'
     fields=['Title', 'Number of Points', 'Creator', 'Time Posted', 'Number of Comments']
