@@ -110,6 +110,28 @@ def save_raw_data(raw_data, timestamp, output_folder='output'):
     return raw_output_path
 
 
+def remove_urls_from_file(file_path):
+    # Regex pattern to find URLs
+    url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+
+    # Construct the new file name
+    base, ext = os.path.splitext(file_path)
+    new_file_path = f"{base}_cleaned{ext}"
+
+    # Read the original markdown content
+    with open(file_path, 'r', encoding='utf-8') as file:
+        markdown_content = file.read()
+
+    # Replace all found URLs with an empty string
+    cleaned_content = re.sub(url_pattern, '', markdown_content)
+
+    # Write the cleaned content to a new file
+    with open(new_file_path, 'w', encoding='utf-8') as file:
+        file.write(cleaned_content)
+    print(f"Cleaned file saved as: {new_file_path}")
+    return cleaned_content
+
+
 
 
 if __name__ == "__main__":
