@@ -133,6 +133,26 @@ def remove_urls_from_file(file_path):
 
 
 
+def create_dynamic_listing_model(field_names: List[str]) -> Type[BaseModel]:
+    """
+    Dynamically creates a Pydantic model based on provided fields.
+    field_name is a list of names of the fields to extract from the markdown.
+    """
+    # Create field definitions using aliases for Field parameters
+    field_definitions = {field: (str, ...) for field in field_names}
+    # Dynamically create the model with all field
+    return create_model('DynamicListingModel', **field_definitions)
+
+
+def create_listings_container_model(listing_model: Type[BaseModel]) -> Type[BaseModel]:
+    """
+    Create a container model that holds a list of the given listing model.
+    """
+    return create_model('DynamicListingsContainer', listings=(List[listing_model], ...))
+
+
+
+
 
 if __name__ == "__main__":
     url = 'https://news.ycombinator.com/'
