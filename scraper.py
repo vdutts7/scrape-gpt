@@ -182,6 +182,44 @@ def format_data(data, DynamicListingsContainer):
 
 
 
+def save_formatted_data(formatted_data, timestamp, output_folder='output'):
+    # Ensure the output folder exists
+    os.makedirs(output_folder, exist_ok=True)
+    
+    # Prepare formatted data as a dictionary
+    formatted_data_dict = formatted_data.dict() if hasattr(formatted_data, 'dict') else formatted_data
+
+    # Save the formatted data as JSON with timestamp in filename
+    json_output_path = os.path.join(output_folder, f'sorted_data_{timestamp}.json')
+    with open(json_output_path, 'w', encoding='utf-8') as f:
+        json.dump(formatted_data_dict, f, indent=4)
+    print(f"Formatted data saved to JSON at {json_output_path}")
+
+    # Prepare data for DataFrame
+    if isinstance(formatted_data_dict, dict):
+        # If the data is a dictionary containing lists, assume these lists are records
+        data_for_df = next(iter(formatted_data_dict.values())) if len(formatted_data_dict) == 1 else formatted_data_dict
+    elif isinstance(formatted_data_dict, list):
+        data_for_df = formatted_data_dict
+    else:
+        raise ValueError("Formatted data is neither a dictionary nor a list, cannot convert to DataFrame")
+
+    # Create DataFrame
+    try:
+        df = pd.DataFrame(data_for_df)
+        print("DataFrame created successfully.")
+
+        # Save the DataFrame to an Excel file
+        excel_output_path = os.path.join(output_folder, f'sorted_data_{timestamp}.xlsx')
+        df.to_excel(excel_output_path, index=False)
+        print(f"Formatted data saved to Excel at {excel_output_path}")
+        
+        return df
+    except Exception as e:
+        print(f"Error creating DataFrame or saving Excel: {str(e)}")
+        return None
+
+
 if __name__ == "__main__":
     url = 'https://news.ycombinator.com/'
     fields=['Title', 'Number of Points', 'Creator', 'Time Posted', 'Number of Comments']
