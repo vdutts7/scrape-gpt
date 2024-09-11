@@ -17,7 +17,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-from openai import OpenAI
+import openai
+
 
 load_dotenv()
 
@@ -33,8 +34,9 @@ def setup_selenium():
     
     # Randomize user-agent to mimic different users
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-    # Specify the path to the ChromeDriver
-    service = Service(r"./chromedriver-win64/chromedriver.exe")  
+    # Specify the full path to the ChromeDriver
+    chromedriver_path = "/usr/local/bin/chromedriver"
+    service = Service(chromedriver_path)
 
     # Initialize the WebDriver
     driver = webdriver.Chrome(service=service, options=options)
@@ -79,9 +81,7 @@ def html_to_markdown_with_readability(html_content):
     
     return markdown_content
 
-
-
-# Define got-40-mini pricing w/o Batch API
+# Define the pricing for gpt-4o-mini without Batch API
 pricing = {
     "gpt-4o-mini": {
         "input": 0.150 / 1_000_000,  # $0.150 per 1M input tokens
@@ -132,7 +132,6 @@ def remove_urls_from_file(file_path):
     return cleaned_content
 
 
-
 def create_dynamic_listing_model(field_names: List[str]) -> Type[BaseModel]:
     """
     Dynamically creates a Pydantic model based on provided fields.
@@ -152,6 +151,7 @@ def create_listings_container_model(listing_model: Type[BaseModel]) -> Type[Base
 
 
 
+
 def trim_to_token_limit(text, model, max_tokens=200000):
     encoder = tiktoken.encoding_for_model(model)
     tokens = encoder.encode(text)
@@ -161,12 +161,17 @@ def trim_to_token_limit(text, model, max_tokens=200000):
     return text
 
 def format_data(data, DynamicListingsContainer):
-    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+
+
+    client = openai(api_key=os.getenv('OPENAI_API_KEY'))
+
     system_message = """You are an intelligent text extraction and conversion assistant. Your task is to extract structured information 
                         from the given text and convert it into a pure JSON format. The JSON should contain only the structured data extracted from the text, 
                         with no additional commentary, explanations, or extraneous information. 
                         You could encounter cases where you can't find the data of the fields you have to extract or the data will be in a foreign language.
                         Please process the following text and provide the output in pure JSON format with no words before or after the JSON:"""
+
     user_message = f"Extract the following information from the provided text:\nPage content:\n\n{data}"
 
     completion = client.beta.chat.completions.parse(
@@ -219,7 +224,6 @@ def save_formatted_data(formatted_data, timestamp, output_folder='output'):
         print(f"Error creating DataFrame or saving Excel: {str(e)}")
         return None
 
-
 def calculate_price(input_text, output_text, model=model_used):
     # Initialize the encoder for the specific model
     encoder = tiktoken.encoding_for_model(model)
@@ -236,6 +240,7 @@ def calculate_price(input_text, output_text, model=model_used):
     total_cost = input_cost + output_cost
     
     return input_token_count, output_token_count, total_cost
+
 
 
 
@@ -279,4 +284,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        

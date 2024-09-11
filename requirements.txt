@@ -10,3 +10,4 @@ selenium
 readability-lxml
 streamlit
 streamlit-tags
+openpyxl
